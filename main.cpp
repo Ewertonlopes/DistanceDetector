@@ -23,7 +23,7 @@ int main( int argc, const char** argv )
     // nestedCascade.load( "../../haarcascade_eye_tree_eyeglasses.xml" ) ;
  
     // Change path before execution 
-    cascade.load( "haarcascade_frontalface_default.xml" ) ; 
+    cascade.load( "haarcascade_frontalface_alt.xml" ) ; 
  
     // Start Video..1) 0 for WebCam 2) "Path to Video" for a Local Video
     capture.open(0); 
@@ -62,7 +62,7 @@ void detectAndDraw( Mat& img, CascadeClassifier& cascade,
     double fx = 1 / scale;
 
     cv::Mat filtered;
-    cv::GaussianBlur(gray, filtered, cv::Size(121, 121), 2.0, 2.0);
+    cv::GaussianBlur(gray, filtered, cv::Size(5, 5), 2.0, 2.0);
  
     // Resize the Grayscale Image 
     resize( filtered, smallImg, Size(), fx, fx, INTER_LINEAR ); 
@@ -83,7 +83,7 @@ void detectAndDraw( Mat& img, CascadeClassifier& cascade,
         int radius;
  
         double aspect_ratio = (double)r.width/r.height;
-        if( 0.92 < aspect_ratio && aspect_ratio < 1.08 )
+        if( 0.95 < aspect_ratio && aspect_ratio < 1.05 )
         {
             center.x = round((r.x + r.width*0.5)*scale);
             center.y = round((r.y + r.height*0.5)*scale);
