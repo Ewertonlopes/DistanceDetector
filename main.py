@@ -27,7 +27,7 @@ while True:
 
     # rgb_frame = frame[:, :, ::-1]
 
-    face_locations = face_recognition.face_locations(frame,10,"hog")
+    face_locations = face_recognition.face_locations(frame,1,"hog")
     face_encodings = face_recognition.face_encodings(frame, face_locations)
     
     if len(known_face_encodings) > 0:
