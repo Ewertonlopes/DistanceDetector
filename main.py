@@ -19,6 +19,7 @@ known_face_names = [
     #"Ewerton"
 ]
 
+counter = 1
 
 #-------------------- -----------------------------------------------------------
 while True:
@@ -28,7 +29,7 @@ while True:
 
     face_locations = face_recognition.face_locations(frame)
     face_encodings = face_recognition.face_encodings(frame, face_locations)
-
+    
     if len(known_face_encodings) > 0:
         for (top, right, bottom, left), face_encoding in zip(face_locations, face_encodings):
 
@@ -40,24 +41,58 @@ while True:
             best_match_index = np.argmin(face_distances)
             if matches[best_match_index]:
                 name = known_face_names[best_match_index]
+                
+            if name == 'Unknown':
+                # Save the unknown face image in the "res/" directory
+                filename = f"res/Subject_{counter}.jpg"
+                cv2.imwrite(filename, frame[top:bottom, left:right])
 
+                new_image = face_recognition.load_image_file(filename)
+                face_locations = face_recognition.face_locations(new_image)
+
+                if face_locations:
+                    # Assuming there is at least one face detected
+                    new_encod = face_recognition.face_encodings(new_image, face_locations)[0]
+
+                    known_face_encodings.append(new_encod)
+                    known_face_names.append(f"Subject_{counter}")
+                else:
+                    print("No face found in the image.")
+                counter += 1
             cv2.rectangle(frame, (left, top), (right, bottom), (0, 0, 255), 2)
 
 
             cv2.rectangle(frame, (left, bottom - 35), (right, bottom), (0, 0, 255), cv2.FILLED)
             font = cv2.FONT_HERSHEY_DUPLEX
             cv2.putText(frame, name, (left + 6, bottom - 6), font,  1.0, (255, 255, 255), 1)
+            print(f'{name} was here')
     else:
         for (top, right, bottom, left), face_encoding in zip(face_locations, face_encodings):
             name = "Unknown"
 
+            if name == 'Unknown':
+                # Save the unknown face image in the "res/" directory
+                filename = f"res/Subject_{counter}.jpg"
+                cv2.imwrite(filename, frame[top:bottom, left:right])
 
-            cv2.rectangle(frame, (left, top), (right, bottom), (0, 0, 255), 2)
+                new_image = face_recognition.load_image_file(filename)
+                face_locations = face_recognition.face_locations(new_image)
 
+                if face_locations:
+                    # Assuming there is at least one face detected
+                    new_encod = face_recognition.face_encodings(new_image, face_locations)[0]
 
-            cv2.rectangle(frame, (left, bottom - 35), (right, bottom), (0, 0, 255), cv2.FILLED)
-            font = cv2.FONT_HERSHEY_DUPLEX
-            cv2.putText(frame, name, (left + 6, bottom - 6), font,  1.0, (255, 255, 255), 1)
+                    known_face_encodings.append(new_encod)
+                    known_face_names.append(f"Subject_{counter}")
+                else:
+                    print("No face found in the image.")
+                counter += 1
+            # cv2.rectangle(frame, (left, top), (right, bottom), (0, 0, 255), 2)
+
+            # cv2.rectangle(frame, (left, bottom - 35), (right, bottom), (0, 0, 255), cv2.FILLED)
+            # font = cv2.FONT_HERSHEY_DUPLEX
+            # cv2.putText(frame, name, (left + 6, bottom - 6), font,  1.0, (255, 255, 255), 1)
+            print(f'{name} was here')
 
 
     cv2.imshow('Video', frame)
