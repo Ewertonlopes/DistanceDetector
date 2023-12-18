@@ -7,10 +7,15 @@ import numpy as np
 #-------------------------------------------------------------------------------
 # Variables & Setup
 
+def estimate_distance(object_width_pixels, focal_length_mm, real_object_width_mm):
+    # Estimate distance using simple size-based scaling
+    distance_mm = (focal_length_mm * real_object_width_mm) / object_width_pixels
+    return distance_mm
+
 video_capture = cv2.VideoCapture(0) # Get a reference to the webcam
 
-test_image = face_recognition.load_image_file('res/face_0.jpg')
-test_encod = face_recognition.face_encodings(test_image) [0]
+# test_image = face_recognition.load_image_file('res/face_0.jpg')
+# test_encod = face_recognition.face_encodings(test_image) [0]
 
 known_face_encodings = [
     #test_encod
@@ -28,7 +33,7 @@ while True:
     # rgb_frame = frame[:, :, ::-1]
 
     face_locations = face_recognition.face_locations(frame,1,"hog")
-    face_encodings = face_recognition.face_encodings(frame, face_locations)
+    face_encodings = face_recognition.face_encodings(frame, face_locations,model='small')
     
     if len(known_face_encodings) > 0:
         for (top, right, bottom, left), face_encoding in zip(face_locations, face_encodings):
@@ -59,13 +64,20 @@ while True:
                 else:
                     print("No face found in the image.")
                 counter += 1
-            cv2.rectangle(frame, (left, top), (right, bottom), (0, 0, 255), 2)
+            else:
+                cv2.rectangle(frame, (left, top), (right, bottom), (0, 0, 255), 2)
 
+                obj_wid = right-left
+                focal = 1197.54
+                estim_head = 130
 
-            cv2.rectangle(frame, (left, bottom - 35), (right, bottom), (0, 0, 255), cv2.FILLED)
-            font = cv2.FONT_HERSHEY_DUPLEX
-            cv2.putText(frame, name, (left + 6, bottom - 6), font,  1.0, (255, 255, 255), 1)
-            print(f'{name} was here')
+                distance = estimate_distance(obj_wid,focal,estim_head)
+                text = name + f' D:{round(distance/1000,2)}'
+                cv2.rectangle(frame, (left, bottom - 35), (right, bottom), (0, 0, 255), cv2.FILLED)
+                font = cv2.FONT_HERSHEY_DUPLEX
+                cv2.putText(frame, text, (left + 6, bottom - 6), font,  1.0, (255, 255, 255), 1)
+                print(distance)
+                print(f'{name} is at {distance/1000} m')
     else:
         for (top, right, bottom, left), face_encoding in zip(face_locations, face_encodings):
             name = "Unknown"
